@@ -70,15 +70,34 @@ async def vip2(bot,update):
 	await bot.send_message(user_id,"Hey You Are Upgraded To Standard. Check Your Plan Here /myplan")
 
 @Client.on_callback_query(filters.regex('vip3'))
-async def vip3(bot,update):
-	id = update.message.reply_to_message.text.split("/addpremium")
-	user_id = id[1].replace(" ", "")
-	inlimit = 107374182400
-	uploadlimit(int(user_id), 107374182400)
-	usertype(int(user_id),"💎 Pro")
-	addpre(int(user_id))
-	await update.message.edit("Added Successfully To Premium Upload Limit 100 GB")
-	await bot.send_message(user_id,"Hey You Are Upgraded To Pro. Check Your Plan Here /myplan")
+async def vip3(bot, update):
+    try:
+        # Check if there is a reply to a message containing the user_id
+        if update.message.reply_to_message and "/addpremium" in update.message.reply_to_message.text:
+            id = update.message.reply_to_message.text.split("/addpremium")
+            user_id = id[1].replace(" ", "")
+        else:
+            # If no reply message, prompt the owner to input a user_id
+            await update.message.edit("Please input the user_id as a reply to this message.")
+            return
+
+        # Convert user_id to an integer
+        user_id = int(user_id)
+
+        # Define premium limits and upgrade user
+        inlimit = 107374182400
+        uploadlimit(user_id, inlimit)
+        usertype(user_id, "💎 Pro")
+        addpre(user_id)
+
+        # Notify both the admin and the user
+        await update.message.edit("Added Successfully To Premium Upload Limit 100 GB")
+        await bot.send_message(user_id, "Hey! You are upgraded to Pro. Check your plan here: /myplan")
+
+    except ValueError:
+        await update.message.edit("Invalid user_id. Please provide a valid numeric user_id.")
+    except Exception as e:
+        await update.message.edit(f"An error occurred: {e}")
 
 
 
